@@ -1,0 +1,22 @@
+{
+  "name": "@ketapay/brand",
+  "version": "0.1.0",
+  "description": "Single source of truth for KetaPay company and legal identity",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KetaPay/brand.git"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
