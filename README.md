@@ -17,8 +17,8 @@ Pin to a tag or commit for reproducible builds, e.g. `github:KetaPay/brand#v0.1.
 ```ts
 import { COMPANY_LEGAL_NAME, COMPANY_LEGAL_NAME_WITH_TRADING, copyrightLine } from "@ketapay/brand";
 
-copyrightLine();      // "© 2026 Keta Technologies Limited. All rights reserved."
-copyrightLine(2025);  // "© 2025 Keta Technologies Limited. All rights reserved."
+copyrightLine();      // "© 2026 Keta Solutions Limited. All rights reserved."
+copyrightLine(2025);  // "© 2025 Keta Solutions Limited. All rights reserved."
 ```
 
 The package builds itself on install via the `prepare` script — no publish step needed.
