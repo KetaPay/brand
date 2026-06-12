@@ -3,8 +3,11 @@
  * Public information only. Never put secrets or internal config here.
  */
 
-/** Registered legal entity name. */
-export const COMPANY_LEGAL_NAME = "Keta Technologies Limited";
+/** Registered legal entity name (per CAC Certificate of Incorporation). */
+export const COMPANY_LEGAL_NAME = "Keta Solutions Limited";
+
+/** CAC company registration number (Nigeria). */
+export const COMPANY_RC_NUMBER = "9605936";
 
 /** Public-facing trading name. */
 export const TRADING_NAME = "KetaPay";
