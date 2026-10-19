@@ -1,0 +1,66 @@
+# Publishes cdn/ to https://cdn.ketapay.com (stack ketapay-cdn, api/infra/cdn.yml). A file at
+# cdn/email/logo-white.png is served at https://cdn.ketapay.com/email/logo-white.png.
+#
+# Files are only ever added or replaced, never removed: emails already in inboxes link to them.
+# Pull requests fail if they delete or rename anything under cdn/.
+name: CDN
+
+on:
+  pull_request:
+    paths: ['cdn/**']
+  push:
+    branches: [main]
+    paths: ['cdn/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cdn-${{ github.ref }}
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: No file under cdn/ is removed or renamed
+        run: |
+          removed=$(git diff --name-status --diff-filter=DR "origin/${{ github.base_ref }}...HEAD" -- cdn/ | cut -f2)
+          if [ -n "$removed" ]; then
+            echo "::error::Sent emails link to these files, so they can't be removed or renamed. Add a new file instead:"
+            echo "$removed"
+            exit 1
+          fi
+
+  publish:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::297658295310:role/ketapay-cdn-upload
+          aws-region: us-east-1
+      - name: Upload
+        run: |
+          out() { aws cloudformation describe-stacks --stack-name ketapay-cdn --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
+          bucket=$(out BucketName)
+          distribution=$(out DistributionId)
+          # No --delete: see the header
+          aws s3 sync cdn/ "s3://$bucket/" --cache-control 'public, max-age=86400' --exclude '.DS_Store'
+          aws cloudfront create-invalidation --distribution-id "$distribution" --paths '/*' --query Invalidation.Id --output text
+      - name: Every file is live
+        run: |
+          failed=0
+          for f in $(cd cdn && find . -type f ! -name .DS_Store | sed 's#^\./##'); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://cdn.ketapay.com/$f")
+            [ "$code" = 200 ] || { echo "::error::$code https://cdn.ketapay.com/$f"; failed=1; }
+          done
+          exit $failed

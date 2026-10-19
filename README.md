@@ -22,3 +22,11 @@ copyrightLine(2025);  // "© 2025 Keta Solutions Limited. All rights reserved."
 ```
 
 The package builds itself on install via the `prepare` script — no publish step needed.
+
+## CDN (cdn.ketapay.com)
+
+Static images for every environment. A file at `cdn/<path>` is served at `https://cdn.ketapay.com/<path>`, e.g. `cdn/email/logo-white.png`.
+
+- Merging to `main` uploads `cdn/` (`.github/workflows/cdn.yml`). The bucket and CloudFront live in the `ketapay-cdn` stack (`api/infra/cdn.yml`).
+- Never delete or rename a file under `cdn/`: sent emails keep linking to it. Add a new file instead; pull requests fail otherwise.
+- Email images are drawn by `email-assets/build.mjs` (Playwright): `PLAYWRIGHT=<path to playwright/index.mjs> node email-assets/build.mjs`.
