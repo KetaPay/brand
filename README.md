@@ -29,4 +29,5 @@ Static images for every environment. A file at `cdn/<path>` is served at `https:
 
 - Merging to `main` uploads `cdn/` (`.github/workflows/cdn.yml`). The bucket and CloudFront live in the `ketapay-cdn` stack (`api/infra/cdn.yml`).
 - Never delete or rename a file under `cdn/`: sent emails keep linking to it. Add a new file instead; pull requests fail otherwise.
+- This is one of the exceptions in [How KetaPay deploys](https://github.com/KetaPay/infra/blob/staging/DEPLOYS.md): no staging, files are only ever added.
 - Email images are drawn by `email-assets/build.mjs` (Playwright): `PLAYWRIGHT=<path to playwright/index.mjs> node email-assets/build.mjs`.
